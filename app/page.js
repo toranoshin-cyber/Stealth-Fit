@@ -16,163 +16,251 @@ const TOTAL = SECTION * exercises.length;
 
 export default function Home(){
 
-  const [started,setStarted]=useState(false);
-  const [finished,setFinished]=useState(false);
-  const [sound,setSound]=useState(true);
-  const [totalLeft,setTotalLeft]=useState(TOTAL);
+const [started,setStarted]=useState(false);
+const [finished,setFinished]=useState(false);
+const [sound,setSound]=useState(true);
+const [totalLeft,setTotalLeft]=useState(TOTAL);
 
-  const audioRef = useRef(null);
+const audioRef=useRef(null);
 
-  const beep=(freq=880,duration=0.1)=>{
+const beep=(freq,duration)=>{
 
-    if(!sound || !audioRef.current) return;
+if(!sound || !audioRef.current) return;
 
-    const ctx=audioRef.current;
-    const osc=ctx.createOscillator();
-    const gain=ctx.createGain();
+const ctx=audioRef.current;
 
-    osc.frequency.value=freq;
-    osc.type="sine";
+const osc=ctx.createOscillator();
+const gain=ctx.createGain();
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+osc.type="sine";
+osc.frequency.value=freq;
 
-    gain.gain.value=0.05;
+osc.connect(gain);
+gain.connect(ctx.destination);
 
-    osc.start();
+gain.gain.value=0.05;
 
-    setTimeout(()=>{
-      osc.stop();
-    },duration*1000);
+osc.start();
 
-  };
+setTimeout(()=>{
+osc.stop();
+},duration);
 
-  const pong=()=>beep(523,0.5); //ポーン
-  const pip=()=>beep(1000,0.08); //ピッ
+};
 
-  useEffect(()=>{
+const pong=()=>beep(520,450);
+const pip=()=>beep(1000,100);
 
-    if(!started || finished) return;
+useEffect(()=>{
 
-    const timer=setInterval(()=>{
+if(!started || finished) return;
 
-      setTotalLeft(prev=>{
+const timer=setInterval(()=>{
 
-        const next=prev-1;
+setTotalLeft(prev=>{
 
-        const sectionLeft=
-          SECTION -
-          ((TOTAL-next)%SECTION || SECTION);
+const next=prev-1;
 
-        // 毎分
-        if(sectionLeft===120 || sectionLeft===60){
-          pip();
-        }
+const currentLeft =
+SECTION -
+((TOTAL-next)%SECTION || SECTION);
 
-        // 3秒前
-        if([3,2,1].includes(sectionLeft)){
-          pip();
-        }
 
-        // CURRENT切替
-        if(sectionLeft===180){
-          pong();
-        }
+// 1分ごと
+if(
+currentLeft===120 ||
+currentLeft===60
+){
+pip();
+}
 
-        // 終了
-        if(next<=0){
-          pong();
-          clearInterval(timer);
-          setFinished(true);
-          return 0;
-        }
+// 3秒前
+if([3,2,1].includes(currentLeft)){
+pip();
+}
 
-        return next;
+// 次部位開始
+if(currentLeft===179){
+pong();
+}
 
-      });
+// 完了
+if(next<=0){
 
-    },1000);
+pong();
 
-    return ()=>clearInterval(timer);
+clearInterval(timer);
 
-  },[started,finished,sound]);
+setFinished(true);
 
-  const currentIndex=
-    Math.min(
-      exercises.length-1,
-      Math.floor((TOTAL-totalLeft)/SECTION)
-    );
+return 0;
+}
 
-  const sectionLeft=
-    SECTION-
-    ((TOTAL-totalLeft)%SECTION || SECTION);
+return next;
 
-  const current=exercises[currentIndex];
+});
 
-  const fmt=(s)=>{
-    const m=Math.floor(s/60);
-    const sec=s%60;
-    return `${m}:${String(sec).padStart(2,"0")}`;
-  };
+},1000);
 
-  return(
+return ()=>clearInterval(timer);
+
+},[started,finished,sound]);
+
+const currentIndex=Math.min(
+exercises.length-1,
+Math.floor((TOTAL-totalLeft)/SECTION)
+);
+
+const current=
+exercises[currentIndex];
+
+const currentLeft=
+SECTION-
+((TOTAL-totalLeft)%SECTION || SECTION);
+
+const fmt=(s)=>{
+
+const m=Math.floor(s/60);
+const sec=s%60;
+
+return `${m}:${String(sec).padStart(2,"0")}`;
+
+};
+
+return(
 
 <main style={{
+
 minHeight:"100vh",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
 textAlign:"center",
+
 background:
 finished?"#fff":
 started?current.bg:"#fff",
+
 color:
-finished?"#111":"#fff",
+finished?"#111":
+started?"#fff":"#111",
+
 transition:"0.8s"
+
 }}>
 
-{!started && (
+{/* 初期 */}
+
+{!started && !finished && (
 
 <div>
 
-<h1>Train-ing</h1>
+<h1
+style={{
+fontSize:56,
+marginBottom:10
+}}
+>
+Train-ing
+</h1>
 
-<label
+<p
+style={{
+marginBottom:40,
+lineHeight:1.8
+}}
+>
+通勤時間を<br/>
+ながら筋トレ時間へ
+</p>
+
+
+<div
 style={{
 display:"flex",
-gap:10,
 justifyContent:"center",
-marginBottom:30
+gap:12,
+alignItems:"center",
+marginBottom:40
 }}
 >
 
-Sound
-
-<input
-type="checkbox"
-checked={sound}
-onChange={()=>setSound(!sound)}
-/>
-
-</label>
+<span>Sound</span>
 
 <button
+onClick={()=>setSound(!sound)}
+style={{
+
+width:60,
+height:32,
+borderRadius:30,
+border:"none",
+
+background:
+sound
+?"#111"
+:"#ccc",
+
+position:"relative",
+
+cursor:"pointer"
+
+}}
+>
+
+<div
+style={{
+
+width:24,
+height:24,
+
+background:"#fff",
+
+borderRadius:"50%",
+
+position:"absolute",
+
+top:4,
+
+left:
+sound
+?32
+:4,
+
+transition:"0.3s"
+
+}}
+/>
+
+</button>
+
+</div>
+
+<button
+
 onClick={()=>{
 
-audioRef.current =
+audioRef.current=
 new(
 window.AudioContext||
 window.webkitAudioContext
 )();
 
 setStarted(true);
+
 pong();
 
 }}
+
 style={{
-padding:"18px 40px",
-fontSize:24
+
+padding:"20px 50px",
+fontSize:28,
+borderRadius:12,
+cursor:"pointer"
+
 }}
+
 >
 
 START
@@ -183,18 +271,28 @@ START
 
 )}
 
+{/* トレ中 */}
+
 {started && !finished && (
 
 <div>
 
 <div>TOTAL</div>
+
 <h1>{fmt(totalLeft)}</h1>
 
 <div>
-CURRENT {fmt(sectionLeft)}
+CURRENT {fmt(currentLeft)}
 </div>
 
-<h2>{current.name}</h2>
+<h2
+style={{
+fontSize:48,
+marginTop:40
+}}
+>
+{current.name}
+</h2>
 
 <p>{current.msg}</p>
 
@@ -202,12 +300,19 @@ CURRENT {fmt(sectionLeft)}
 
 )}
 
+{/* 終了 */}
+
 {finished && (
 
 <div>
 
-<h1>お疲れ様でした！</h1>
-<p>今日も一日頑張りましょう</p>
+<h1>
+お疲れ様でした！
+</h1>
+
+<p>
+今日も一日頑張りましょう
+</p>
 
 </div>
 
@@ -215,6 +320,6 @@ CURRENT {fmt(sectionLeft)}
 
 </main>
 
-  );
+);
 
 }
