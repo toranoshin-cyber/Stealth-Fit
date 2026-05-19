@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const exercises=[
+const exercises = [
 
 {
 name:"お腹",
@@ -11,10 +11,10 @@ msg:"お腹を凹ませてキープ",
 tip:"きついズボンのチャックを閉めるイメージ",
 
 image:`
- ○
-/│\\
-███
-/ \\
+ 〇
+╱│╲
+ █
+╱ ╲
 `
 },
 
@@ -25,10 +25,10 @@ msg:"お尻を締める",
 tip:"コインを挟む感覚",
 
 image:`
- ○
-/│\\
-/█\\
-/ \\
+ 〇
+╱│╲
+╱█╲
+╱ ╲
 `
 },
 
@@ -39,9 +39,9 @@ msg:"内側⇄外側へ押し合う",
 tip:"膝を動かさない",
 
 image:`
- ○
-/│\\
-/██\\
+ 〇
+╱│╲
+╱██╲
 `
 },
 
@@ -52,10 +52,10 @@ msg:"肩甲骨を寄せる",
 tip:"つり革を後ろへ引く",
 
 image:`
- ○
+ 〇
 ███
-/│\\
-/ \\
+╱│╲
+╱ ╲
 `
 },
 
@@ -66,9 +66,9 @@ msg:"腕を引き寄せる",
 tip:"つり革を手前へ",
 
 image:`
-\\○/
-/│\\
-/ \\
+╲〇╱
+ │
+╱ ╲
 `
 },
 
@@ -79,10 +79,10 @@ msg:"腰脇を締める",
 tip:"姿勢を良くする",
 
 image:`
- ○
-/│\\
+ 〇
+╱│╲
 ░█░
-/ \\
+╱ ╲
 `
 },
 
@@ -93,9 +93,9 @@ msg:"つま先立ち",
 tip:"上下運動",
 
 image:`
- ○
-/│\\
-/█\\
+ 〇
+╱│╲
+╱█╲
  ▲
 `
 }
@@ -128,6 +128,7 @@ const currentLeft=
 SECTION-
 ((TOTAL-totalLeft)%SECTION||SECTION);
 
+
 const beep=(freq,dur)=>{
 
 if(!sound||!audioRef.current)return;
@@ -147,15 +148,15 @@ gain.gain.value=.05;
 
 osc.start();
 
-setTimeout(()=>{
-osc.stop();
-},dur);
+setTimeout(()=>osc.stop(),dur);
 
 };
 
 const pong=()=>beep(520,350);
 const pip=()=>beep(1000,80);
 const tick=()=>beep(700,40);
+
+
 
 useEffect(()=>{
 
@@ -172,30 +173,22 @@ SECTION-
 ((TOTAL-next)%SECTION||SECTION);
 
 
-//10秒毎
-if(
-remain%10===0 &&
-remain!==0
-){
+if(remain%10===0 && remain!==0){
 tick();
 }
 
-//1分毎
-if(remain===120||remain===60){
+if(remain===120 || remain===60){
 pip();
 }
 
-//3秒前
 if([3,2,1].includes(remain)){
 pip();
 }
 
-//切替
 if(remain===SECTION-1){
 pong();
 }
 
-//終了
 if(next<=0){
 
 pong();
@@ -205,7 +198,6 @@ clearInterval(timer);
 setFinished(true);
 
 return 0;
-
 }
 
 return next;
@@ -216,23 +208,19 @@ return next;
 
 return()=>clearInterval(timer);
 
-},[
-started,
-finished,
-SECTION,
-TOTAL,
-sound
-]);
+},
+[started,finished,SECTION,TOTAL,sound]);
+
 
 const fmt=(s)=>{
 
 const m=Math.floor(s/60);
-
 const sec=s%60;
 
 return `${m}:${String(sec).padStart(2,"0")}`;
 
 };
+
 
 return(
 
@@ -271,13 +259,17 @@ transition:"1s"
 
 <div>
 
-<h1
-style={{
-fontSize:64
-}}
->
+<h1 style={{
+
+fontSize:64,
+marginBottom:30
+
+}}>
+
 Train-ing
+
 </h1>
+
 
 <p>
 
@@ -288,8 +280,11 @@ Train-ing
 
 
 <h2>
+
 コース選択
+
 </h2>
+
 
 <div style={{
 
@@ -350,8 +345,7 @@ transition:".2s"
 
 >
 
-{label}
-<br/>
+{label}<br/>
 ({lv}分)
 
 </button>
@@ -361,22 +355,18 @@ transition:".2s"
 </div>
 
 
-<div
-style={{
+<div style={{
+
 marginTop:30
-}}
->
+
+}}>
 
 Sound
 
 <input
-
 type="checkbox"
-
 checked={sound}
-
 onChange={()=>setSound(!sound)}
-
 />
 
 </div>
@@ -422,6 +412,7 @@ START
 )}
 
 
+
 {/* トレ中 */}
 
 {started&&!finished&&(
@@ -431,7 +422,9 @@ START
 <div>TOTAL</div>
 
 <h1>
+
 {fmt(totalLeft)}
+
 </h1>
 
 
@@ -440,7 +433,9 @@ START
 CURRENT
 
 <h2>
+
 {fmt(currentLeft)}
+
 </h2>
 
 </div>
@@ -448,9 +443,13 @@ CURRENT
 
 <pre style={{
 
-fontSize:28,
+fontSize:34,
 
-lineHeight:1,
+lineHeight:1.1,
+
+fontFamily:"monospace",
+
+letterSpacing:"2px",
 
 marginTop:20
 
@@ -477,17 +476,17 @@ marginTop:20
 
 <div style={{
 
-marginTop:20,
-
 opacity:.8,
 
-maxWidth:280
+maxWidth:280,
+
+marginTop:20,
+
+marginInline:"auto"
 
 }}>
 
-💡
-
-{current.tip}
+💡 {current.tip}
 
 </div>
 
@@ -511,15 +510,23 @@ maxWidth:280
 
 <p>
 
-今日も一日
+今日も一日<br/>
 頑張りましょう
 
 </p>
 
+
 <button
 
-onClick={()=>{
-location.reload();
+onClick={()=>location.reload()}
+
+style={{
+
+padding:
+"16px 32px",
+
+marginTop:20
+
 }}
 
 >
