@@ -2,69 +2,109 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const exercises = [
+const exercises=[
 
 {
 name:"お腹",
 bg:"#111",
-tip:"きついズボンのチャックを閉めるため、お腹を薄くするイメージ",
-image:"🫃➡️🧍",
-msg:"お腹を凹ませてキープ"
+msg:"お腹を凹ませてキープ",
+tip:"きついズボンのチャックを閉めるイメージ",
+
+image:`
+ ○
+/│\\
+███
+/ \\
+`
 },
 
 {
 name:"お尻",
 bg:"#263238",
-tip:"左右のお尻でコインを挟むイメージ",
-image:"🪙",
-msg:"お尻をキュッと締める"
+msg:"お尻を締める",
+tip:"コインを挟む感覚",
+
+image:`
+ ○
+/│\\
+/█\\
+/ \\
+`
 },
 
 {
 name:"太もも",
 bg:"#1b5e20",
-tip:"膝を動かさず内→外へ押し合う",
-image:"🦵",
-msg:"太もも全体に力"
+msg:"内側⇄外側へ押し合う",
+tip:"膝を動かさない",
+
+image:`
+ ○
+/│\\
+/██\\
+`
 },
 
 {
 name:"背中上部",
 bg:"#0d47a1",
-tip:"つり革を後ろ斜めに引く",
-image:"🚇",
-msg:"肩甲骨を寄せる"
+msg:"肩甲骨を寄せる",
+tip:"つり革を後ろへ引く",
+
+image:`
+ ○
+███
+/│\\
+/ \\
+`
 },
 
 {
 name:"両腕",
 bg:"#6a1b9a",
-tip:"つり革を手前に引く",
-image:"💪",
-msg:"腕全体を意識"
+msg:"腕を引き寄せる",
+tip:"つり革を手前へ",
+
+image:`
+\\○/
+/│\\
+/ \\
+`
 },
 
 {
 name:"背中下部",
 bg:"#5d4037",
-tip:"姿勢を良くした時の腰の両脇",
-image:"🧍",
-msg:"腰まわりを締める"
+msg:"腰脇を締める",
+tip:"姿勢を良くする",
+
+image:`
+ ○
+/│\\
+░█░
+/ \\
+`
 },
 
 {
 name:"ふくらはぎ",
 bg:"#455a64",
-tip:"つま先立ち→ゆっくり下ろす",
-image:"🦶",
-msg:"上下を繰り返す"
+msg:"つま先立ち",
+tip:"上下運動",
+
+image:`
+ ○
+/│\\
+/█\\
+ ▲
+`
 }
 
 ];
 
 export default function Home(){
 
-const [level,setLevel]=useState(1);
+const [level,setLevel]=useState(2);
 const [started,setStarted]=useState(false);
 const [finished,setFinished]=useState(false);
 const [sound,setSound]=useState(true);
@@ -90,7 +130,7 @@ SECTION-
 
 const beep=(freq,dur)=>{
 
-if(!sound || !audioRef.current)return;
+if(!sound||!audioRef.current)return;
 
 const ctx=audioRef.current;
 
@@ -103,7 +143,7 @@ osc.type="sine";
 osc.connect(gain);
 gain.connect(ctx.destination);
 
-gain.gain.value=0.05;
+gain.gain.value=.05;
 
 osc.start();
 
@@ -113,13 +153,13 @@ osc.stop();
 
 };
 
-const pong=()=>beep(520,400);
+const pong=()=>beep(520,350);
 const pip=()=>beep(1000,80);
 const tick=()=>beep(700,40);
 
 useEffect(()=>{
 
-if(!started || finished)return;
+if(!started||finished)return;
 
 const timer=setInterval(()=>{
 
@@ -127,34 +167,31 @@ setTotalLeft(prev=>{
 
 const next=prev-1;
 
-const sectionRemain=
+const remain=
 SECTION-
 ((TOTAL-next)%SECTION||SECTION);
 
 
 //10秒毎
 if(
-sectionRemain%10===0 &&
-sectionRemain!==0
+remain%10===0 &&
+remain!==0
 ){
 tick();
 }
 
 //1分毎
-if(
-sectionRemain===120 ||
-sectionRemain===60
-){
+if(remain===120||remain===60){
 pip();
 }
 
 //3秒前
-if([3,2,1].includes(sectionRemain)){
+if([3,2,1].includes(remain)){
 pip();
 }
 
-//次種目
-if(sectionRemain===SECTION-1){
+//切替
+if(remain===SECTION-1){
 pong();
 }
 
@@ -177,19 +214,20 @@ return next;
 
 },1000);
 
-return ()=>clearInterval(timer);
+return()=>clearInterval(timer);
 
 },[
 started,
 finished,
-sound,
 SECTION,
-TOTAL
+TOTAL,
+sound
 ]);
 
 const fmt=(s)=>{
 
 const m=Math.floor(s/60);
+
 const sec=s%60;
 
 return `${m}:${String(sec).padStart(2,"0")}`;
@@ -201,77 +239,150 @@ return(
 <main style={{
 
 minHeight:"100vh",
+
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
+
 textAlign:"center",
 
 background:
-finished?"#fff":
-started?current.bg:"#fff",
+finished
+?"#fff"
+:started
+?current.bg
+:"#fff",
 
 color:
-finished?"#111":
-started?"#fff":"#111",
+finished
+?"#111"
+:started
+?"#fff"
+:"#111",
 
-transition:"0.8s"
+transition:"1s"
 
 }}>
 
-{!started && !finished &&(
+
+{/* 初期画面 */}
+
+{!started&&!finished&&(
 
 <div>
 
-<h1 style={{fontSize:56}}>
+<h1
+style={{
+fontSize:64
+}}
+>
 Train-ing
 </h1>
 
 <p>
+
 通勤時間を<br/>
 ながら筋トレへ
+
 </p>
 
-<div style={{marginTop:30}}>
 
-<h3>コース選択</h3>
+<h2>
+コース選択
+</h2>
 
-<button onClick={()=>setLevel(1)}>
-通勤デビュー（1分）
+<div style={{
+
+display:"flex",
+gap:10,
+justifyContent:"center",
+flexWrap:"wrap"
+
+}}>
+
+{[
+[1,"通勤デビュー"],
+[2,"習慣化"],
+[3,"ガチ勢"]
+
+].map(([lv,label])=>(
+
+<button
+
+key={lv}
+
+onClick={()=>setLevel(lv)}
+
+style={{
+
+padding:"14px",
+
+borderRadius:12,
+
+background:
+level===lv
+?"#111"
+:"#fff",
+
+color:
+level===lv
+?"#fff"
+:"#111",
+
+fontWeight:
+level===lv
+?"bold"
+:"normal",
+
+transform:
+level===lv
+?"scale(1.08)"
+:"scale(1)",
+
+border:
+level===lv
+?"2px solid #111"
+:"1px solid #aaa",
+
+transition:".2s"
+
+}}
+
+>
+
+{label}
+<br/>
+({lv}分)
+
 </button>
 
-<button onClick={()=>setLevel(2)}>
-習慣化（2分）
-</button>
-
-<button onClick={()=>setLevel(3)}>
-ガチ勢（3分）
-</button>
+))}
 
 </div>
 
 
-<div style={{
+<div
+style={{
 marginTop:30
-}}>
+}}
+>
 
 Sound
 
 <input
+
 type="checkbox"
+
 checked={sound}
+
 onChange={()=>setSound(!sound)}
+
 />
 
 </div>
 
 
 <button
-
-style={{
-marginTop:40,
-padding:"20px 50px",
-fontSize:30
-}}
 
 onClick={()=>{
 
@@ -289,6 +400,17 @@ pong();
 
 }}
 
+style={{
+
+marginTop:40,
+
+padding:
+"20px 60px",
+
+fontSize:32
+
+}}
+
 >
 
 START
@@ -299,7 +421,10 @@ START
 
 )}
 
-{started && !finished &&(
+
+{/* トレ中 */}
+
+{started&&!finished&&(
 
 <div>
 
@@ -308,6 +433,7 @@ START
 <h1>
 {fmt(totalLeft)}
 </h1>
+
 
 <div>
 
@@ -320,45 +446,87 @@ CURRENT
 </div>
 
 
-<h1 style={{
-fontSize:60
+<pre style={{
+
+fontSize:28,
+
+lineHeight:1,
+
+marginTop:20
+
 }}>
+
 {current.image}
-</h1>
+
+</pre>
+
 
 <h2>
+
 {current.name}
+
 </h2>
 
-<p>
+
+<div>
+
 {current.msg}
-</p>
+
+</div>
+
 
 <div style={{
 
+marginTop:20,
+
 opacity:.8,
-maxWidth:280,
-margin:"20px auto"
+
+maxWidth:280
 
 }}>
-💡 {current.tip}
+
+💡
+
+{current.tip}
+
 </div>
 
 </div>
 
 )}
 
-{finished &&(
+
+
+{/* 終了 */}
+
+{finished&&(
 
 <div>
 
 <h1>
+
 お疲れ様でした！
+
 </h1>
 
 <p>
-今日も一日頑張りましょう
+
+今日も一日
+頑張りましょう
+
 </p>
+
+<button
+
+onClick={()=>{
+location.reload();
+}}
+
+>
+
+もう一度
+
+</button>
 
 </div>
 
